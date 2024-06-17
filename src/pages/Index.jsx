@@ -4,6 +4,7 @@ import { FaExchangeAlt } from "react-icons/fa";
 
 const Index = () => {
   const [inputText, setInputText] = useState('');
+  const [charCount, setCharCount] = useState(0);
   const [translatedText, setTranslatedText] = useState('');
   const [sourceLang, setSourceLang] = useState('en');
   const [targetLang, setTargetLang] = useState('zh');
@@ -42,10 +43,17 @@ const Index = () => {
         </HStack>
         <Textarea
           value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
+          onChange={(e) => {
+            const text = e.target.value;
+            if (text.length <= 1200) {
+              setInputText(text);
+              setCharCount(text.length);
+            }
+          }}
           placeholder="Enter text to translate"
           size="md"
         />
+        <Text>{charCount}/1200 characters</Text>
         <Button colorScheme="blue" onClick={handleTranslate}>Translate</Button>
         {translatedText && (
           <Box p={4} borderWidth="1px" borderRadius="md" width="100%">
