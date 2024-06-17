@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { franc } from 'franc';
 import { Container, VStack, Textarea, Select, Text, Box, HStack, SimpleGrid } from "@chakra-ui/react";
 import { FaExchangeAlt } from "react-icons/fa";
@@ -10,6 +10,15 @@ const Index = () => {
   const [translatedText, setTranslatedText] = useState('');
   const [sourceLang, setSourceLang] = useState('auto');
   const [targetLang, setTargetLang] = useState('zh');
+
+  const textareaRef = useRef(null);
+
+  const handleInput = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+    }
+  };
 
   const handleTranslate = async (text) => {
     // Placeholder for translation API integration
@@ -68,6 +77,10 @@ const Index = () => {
               }}
               placeholder="Enter text to translate"
               size="md"
+              minHeight="150px"
+              resize="none"
+              ref={textareaRef}
+              onInput={handleInput}
             />
             <Text>{charCount}/1200 characters</Text>
           </Box>
