@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Container, VStack, Textarea, Button, Select, Text, Box, HStack, SimpleGrid } from "@chakra-ui/react";
+import React, { useState, useEffect } from 'react';
+import { Container, VStack, Textarea, Select, Text, Box, HStack, SimpleGrid } from "@chakra-ui/react";
 import { FaExchangeAlt } from "react-icons/fa";
+import debounce from 'lodash.debounce';
 
 const Index = () => {
   const [inputText, setInputText] = useState('');
@@ -9,14 +10,25 @@ const Index = () => {
   const [sourceLang, setSourceLang] = useState('en');
   const [targetLang, setTargetLang] = useState('zh');
 
-  const handleTranslate = async () => {
+  const handleTranslate = async (text) => {
     // Placeholder for translation API integration
     // Replace this with actual API call
-    setTranslatedText(`Translated (${sourceLang} to ${targetLang}): ${inputText}`);
+    setTranslatedText(`Translated (${sourceLang} to ${targetLang}): ${text}`);
   };
 
+  const debouncedTranslate = debounce(handleTranslate, 500);
+
+  useEffect(() => {
+    if (inputText) {
+      debouncedTranslate(inputText);
+    }
+    return () => {
+      debouncedTranslate.cancel();
+    };
+  }, [inputText, sourceLang, targetLang]);
+
   return (
-    <Container centerContent maxW="container.md" py={10}>
+    <Container centerContent maxW="container.lg" py={10}>
       <VStack spacing={4} width="100%">
         <HStack width="100%" spacing={4}>
           <Select value={sourceLang} onChange={(e) => setSourceLang(e.target.value)}>
@@ -25,7 +37,7 @@ const Index = () => {
             <option value="bo">藏文</option>
             <option value="lzh">文言文</option>
           </Select>
-          <Button onClick={() => { const temp = sourceLang; setSourceLang(targetLang); setTargetLang(temp); }}><FaExchangeAlt /></Button>
+          <Box as="button" onClick={() => { const temp = sourceLang; setSourceLang(targetLang); setTargetLang(temp); }}><FaExchangeAlt /></Box>
           <Select value={targetLang} onChange={(e) => setTargetLang(e.target.value)}>
             <option value="zh">中文</option>
             <option value="en">英文</option>
@@ -48,7 +60,6 @@ const Index = () => {
               size="md"
             />
             <Text>{charCount}/1200 characters</Text>
-            <Button colorScheme="blue" onClick={handleTranslate} mt={2}>Translate</Button>
           </Box>
           {translatedText && (
             <Box p={4} borderWidth="1px" borderRadius="md" width="100%">
