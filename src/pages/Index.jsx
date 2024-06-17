@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { franc } from 'franc';
 import { Container, VStack, Textarea, Select, Text, Box, HStack, SimpleGrid } from "@chakra-ui/react";
 import { FaExchangeAlt } from "react-icons/fa";
 import debounce from 'lodash.debounce';
@@ -20,15 +21,19 @@ const Index = () => {
 
   useEffect(() => {
     if (inputText) {
+      const detectedLang = franc(inputText);
+      if (detectedLang !== 'und') {
+        setSourceLang(detectedLang);
+      }
       debouncedTranslate(inputText);
     }
     return () => {
       debouncedTranslate.cancel();
     };
-  }, [inputText, sourceLang, targetLang]);
+  }, [inputText, targetLang]);
 
   return (
-    <Container centerContent maxW="container.lg" py={10}>
+    <Container centerContent maxW="container.lg" py={10} bg="gray.50">
       <VStack spacing={4} width="100%">
         <HStack width="100%" spacing={4}>
           <Select value={sourceLang} onChange={(e) => setSourceLang(e.target.value)}>
@@ -46,7 +51,7 @@ const Index = () => {
           </Select>
         </HStack>
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} width="100%">
-          <Box>
+          <Box bg="white" p={4} borderWidth="1px" borderRadius="md">
             <Textarea
               value={inputText}
               onChange={(e) => {
@@ -62,7 +67,7 @@ const Index = () => {
             <Text>{charCount}/1200 characters</Text>
           </Box>
           {translatedText && (
-            <Box p={4} borderWidth="1px" borderRadius="md" width="100%">
+            <Box bg="gray.100" p={4} borderWidth="1px" borderRadius="md" width="100%">
               <Text>{translatedText}</Text>
             </Box>
           )}
