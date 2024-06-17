@@ -81,8 +81,8 @@ const Index = () => {
               resize="none"
               ref={textareaRef}
               onInput={handleInput}
-              border="none"
-              boxShadow="none"
+              _focus={{ boxShadow: "none", borderColor: "gray.300" }}
+              _hover={{ borderColor: "gray.300" }}
             />
             <Text>{charCount}/1200 characters</Text>
           </Box>
