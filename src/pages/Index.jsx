@@ -8,7 +8,7 @@ const Index = () => {
   const [inputText, setInputText] = useState('');
   const [charCount, setCharCount] = useState(0);
   const [translatedText, setTranslatedText] = useState('');
-  const [sourceLang, setSourceLang] = useState('en');
+  const [sourceLang, setSourceLang] = useState('auto');
   const [targetLang, setTargetLang] = useState('zh');
 
   const handleTranslate = async (text) => {
@@ -21,22 +21,27 @@ const Index = () => {
 
   useEffect(() => {
     if (inputText) {
-      const detectedLang = franc(inputText);
-      if (detectedLang !== 'und') {
-        setSourceLang(detectedLang);
+      let detectedLang = sourceLang;
+      if (sourceLang === 'auto') {
+        detectedLang = franc(inputText);
+        if (detectedLang === 'und') {
+          detectedLang = 'en'; // default to English if language is undetermined
+        }
       }
+      setSourceLang(detectedLang);
       debouncedTranslate(inputText);
     }
     return () => {
       debouncedTranslate.cancel();
     };
-  }, [inputText, targetLang]);
+  }, [inputText, targetLang, sourceLang]);
 
   return (
     <Container centerContent maxW="container.lg" py={10} bg="gray.50">
       <VStack spacing={4} width="100%">
         <HStack width="100%" spacing={4}>
           <Select value={sourceLang} onChange={(e) => setSourceLang(e.target.value)}>
+            <option value="auto">Auto Detect</option>
             <option value="zh">中文</option>
             <option value="en">英文</option>
             <option value="bo">藏文</option>
