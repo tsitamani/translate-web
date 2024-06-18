@@ -1,7 +1,10 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
 import App from "./App.jsx";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { Global, css } from "@emotion/react";
+import { LanguageProvider } from './context/LanguageContext';
+import { createRoot } from 'react-dom/client'
 
 const colors = {
   brand: {
@@ -13,10 +16,23 @@ const colors = {
 
 const theme = extendTheme({ colors });
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+const GlobalStyles = () => (
+  <Global
+    styles={css`
+      body {
+        background-color: ${theme.colors.gray[80]};
+      }
+    `}
+  />
+);
+
+createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
-      <App />
+      <LanguageProvider>
+        <GlobalStyles />
+        <App />
+      </LanguageProvider>
     </ChakraProvider>
   </React.StrictMode>
 );

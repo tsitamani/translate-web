@@ -1,15 +1,33 @@
+// src/pages/Index.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { franc } from 'franc';
 import { Container, VStack, Textarea, Select, Text, Box, HStack, SimpleGrid } from "@chakra-ui/react";
 import { FaExchangeAlt } from "react-icons/fa";
 import debounce from 'lodash.debounce';
+
+const detectLanguage = (text) => {
+  const patterns = {
+    zho_Hans: /[\u4e00-\u9fa5]/, // 中文简体
+    eng_Latn: /[a-zA-Z]/,         // 英文
+    bod_Tibt: /[\u0F00-\u0FFF]/,  // 藏文
+    zho_Hant: /[\u4e00-\u9fff]/,  // 文言文（基本等同于中文繁体）
+    rus_Cyrl: /[\u0400-\u04FF]/,  // 俄文
+  };
+
+  for (const [lang, pattern] of Object.entries(patterns)) {
+    if (pattern.test(text)) {
+      return lang;
+    }
+  }
+
+  return 'eng_Latn'; // 默认英文
+};
 
 const Index = () => {
   const [inputText, setInputText] = useState('');
   const [charCount, setCharCount] = useState(0);
   const [translatedText, setTranslatedText] = useState('');
   const [sourceLang, setSourceLang] = useState('auto');
-  const [targetLang, setTargetLang] = useState('zh');
+  const [targetLang, setTargetLang] = useState('zho_Hans');
 
   const textareaRef = useRef(null);
 
@@ -20,22 +38,46 @@ const Index = () => {
     }
   };
 
-  const handleTranslate = async (text) => {
-    // Placeholder for translation API integration
-    // Replace this with actual API call
-    setTranslatedText(`Translated (${sourceLang} to ${targetLang}): ${text}`);
+  const handleTranslate = (text) => {
+    const params = {
+      text: text,
+      source: sourceLang,
+      target: targetLang,
+    };
+
+    console.log('Request params:', params);
+
+    fetch('https://api-fashiai-2024-6-18-2.cpolar.cn/api/v3/translate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    })
+      .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Response data:', data);
+        setTranslatedText(data.result);
+      })
+      .catch(error => {
+        console.error('Translation error:', error);
+        setTranslatedText('Error translating text. ' + error.message);
+      });
   };
 
-  const debouncedTranslate = debounce(handleTranslate, 500);
+  const debouncedTranslate = debounce(handleTranslate, 1200);
 
   useEffect(() => {
     if (inputText) {
       let detectedLang = sourceLang;
       if (sourceLang === 'auto') {
-        detectedLang = franc(inputText);
-        if (detectedLang === 'und') {
-          detectedLang = 'en'; // default to English if language is undetermined
-        }
+        detectedLang = detectLanguage(inputText);
       }
       setSourceLang(detectedLang);
       debouncedTranslate(inputText);
@@ -51,18 +93,21 @@ const Index = () => {
         <HStack width="100%" spacing={4}>
           <Select value={sourceLang} onChange={(e) => setSourceLang(e.target.value)}>
             <option value="auto">Auto Detect</option>
-            <option value="zh">中文</option>
-            <option value="en">英文</option>
-            <option value="bo">藏文</option>
-            <option value="lzh">文言文</option>
+            <option value="zho_Hans">中文</option>
+            <option value="eng_Latn">英文</option>
+            <option value="bod_Tibt">藏文</option>
+            <option value="zho_Hant">文言文</option>
+            <option value="rus_Cyrl">俄文</option>
           </Select>
           <Box as="button" onClick={() => { const temp = sourceLang; setSourceLang(targetLang); setTargetLang(temp); }}><FaExchangeAlt /></Box>
           <Select value={targetLang} onChange={(e) => setTargetLang(e.target.value)}>
-            <option value="zh">中文</option>
-            <option value="en">英文</option>
-            <option value="bo">藏文</option>
-            <option value="lzh">文言文</option>
+            <option value="zho_Hans">中文 China</option>
+            <option value="eng_Latn">英文 English</option>
+            <option value="bod_Tibt">藏文 Tibetan</option>
+            <option value="zho_Hant">文言文 Wenyan</option>
+            <option value="rus_Cyrl">俄文 Russian</option>
           </Select>
+          
         </HStack>
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} width="100%">
           <Box bg="white" p={4} borderWidth="1px" borderRadius="md">
