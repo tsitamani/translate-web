@@ -107,7 +107,6 @@ const Index = () => {
             <option value="zho_Hant">文言文 Wenyan</option>
             <option value="rus_Cyrl">俄文 Russian</option>
           </Select>
-          
         </HStack>
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} width="100%">
           <Box bg="white" p={4} borderWidth="1px" borderRadius="md">

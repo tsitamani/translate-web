@@ -21,6 +21,15 @@ const Layout = ({ children }) => {
       <Container maxW="container.lg" py={4} flex="1">
         {children}
       </Container>
+      <Container maxW="container.lg">
+        <Text textAlign="center" color="gray.500" mb={6}>
+          该页面属于测试页面，主页面请访问
+          <a href="https://fashi.ai/translate" target="_blank" style={{ marginLeft: '5px', color: 'blue', textDecoration: 'underline' }}>
+            这里
+          </a>
+        </Text>
+      </Container>
+      
       <Box as="footer" bg="gray.700" color="white" py={4}>
         <Container maxW="container.lg">
           <Text fontSize="sm">© 2024 FashiAI. 版权所有.</Text>
